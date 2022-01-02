@@ -1,0 +1,97 @@
+/*
+https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/description/
+
+Given a sorted array nums, remove the duplicates in-place such that duplicates appeared at most twice and return the new length.
+Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+
+Example 1:
+    Given nums = [1,1,1,2,2,3],
+    Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
+    It doesn't matter what you leave beyond the returned length.
+
+Example 2:
+    Given nums = [0,0,1,1,1,1,2,3,3],
+    Your function should return length = 7, with the first seven elements of nums being modified to 0, 0, 1, 1, 2, 3 and 3 respectively.
+    It doesn't matter what values are set beyond the returned length.
+
+Clarification:
+    Confused why the returned value is an integer but your answer is an array?
+    Note that the input array is passed in by reference,
+    which means modification to the input array will be known to the caller as well.
+
+    Internally you can think of this:
+    // nums is passed in by reference. (i.e., without making a copy)
+    int len = removeDuplicates(nums);
+
+    // any modification to nums in your function would be known by the caller.
+    // using the length returned by your function, it prints the first len elements.
+    for (int i = 0; i < len; i++) {
+        print(nums[i]);
+    }
+ */
+
+package p0500_;
+
+import java.util.Arrays;
+
+/**
+ * @author half-dead
+ */
+public class Puzzle080_RemoveDuplicatesFromSortedArrayII {
+
+    public static void main(String[] args) {
+        Solution1 solution = new Puzzle080_RemoveDuplicatesFromSortedArrayII().new Solution1();
+        int[] arr = new int[]{0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 4, 5};
+        System.out.println(solution.removeDuplicates(arr));
+        System.out.println(Arrays.toString(arr));
+    }
+
+    class Solution {
+        public int removeDuplicates(int[] nums) {
+            int left = 0, right = 0, last = nums.length - 1;
+            int current = 0, count = 0;
+            while (right <= last) {
+                if (count == 0) {
+                    current = nums[right++];
+                    count++;
+                    left++;
+                } else if (count == 1) {
+                    nums[left] = nums[right];
+                    if (current == nums[right]) {
+                        count++;
+                    } else {
+                        current = nums[right];
+                    }
+                    left++;
+                    right++;
+                } else {
+                    while (right <= last && nums[right] == current) {
+                        right++;
+                    }
+                    if (right <= last) {
+                        current = nums[right];
+                        nums[left++] = nums[right++];
+                        count = 1;
+                    }
+                }
+            }
+            return left;
+        }
+    }
+
+    class Solution1 {
+        public int removeDuplicates(int[] nums) {
+            int len = nums.length;
+            if (len <= 2) {
+                return len;
+            }
+            int index = 2;
+            for (int i = 2; i < len; i++) {
+                if (nums[i] != nums[index - 2]) {
+                    nums[index++] = nums[i];
+                }
+            }
+            return index;
+        }
+    }
+}

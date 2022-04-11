@@ -14,21 +14,30 @@ public class Puzzle757 {
         }));
     }
 
+    // sort + greedy
     class Solution {
         public int intersectionSizeTwo(int[][] intervals) {
-            Arrays.sort(intervals, (a, b) -> a[1] == b[1] ? b[0] - a[0] : a[1] - b[1]);
+            // sort by end asc, then start desc, this is the tricky part
+            Arrays.sort(intervals, (a, b) -> {
+                int d = a[1] - b[1];
+                return d == 0 ? b[0] - a[0] : d;
+            });
 
-            int res = 0, lo = -1, hi = -1;
-            for (int[] v : intervals) {
-                boolean loIn = v[0] <= lo, hiIn = v[0] <= hi;
-                if (hiIn && loIn) continue;
-
-                res += (hiIn ? 1 : 2);
-
-                lo = (hiIn ? hi : v[1] - 1);
-                hi = v[1];
+            int n = intervals.length, ans = 0;
+            int lo = intervals[0][1] - 1, hi = intervals[0][1];
+            for (int i = 1; i < n; i++) {
+                int left = intervals[i][0], right = intervals[i][1];
+                if (left > lo && left <= hi) {
+                    ans++;
+                    lo = hi;
+                    hi = right;
+                } else if (left > hi) {
+                    ans += 2;
+                    lo = right - 1;
+                    hi = right;
+                }
             }
-            return res;
+            return ans + 2;
         }
     }
 }

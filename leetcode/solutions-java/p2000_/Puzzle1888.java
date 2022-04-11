@@ -7,19 +7,37 @@ package p2000_;
  */
 public class Puzzle1888 {
 
+    // sliding window
+    // try 10101.... and 01010....
     class Solution {
         public int minFlips(String s) {
-            char[] cs = s.toCharArray();
-            int len = cs.length, res = len;
-            for (char c = '0'; c <= '1'; c++) {
-                int i = s.indexOf(c), cnt = 0;
-                char exp = c;
-                for (int j = 0; j < len; j++) {
-                    cnt += cs[i] == exp ? 0 : 1;
-                    i = (i + 1) % len;
-                    exp = exp == '0' ? '1' : '0';
+            int n = s.length();
+            String ss = s + s;
+
+            // starts with '0'
+            int cnt = 0, res = n;
+            for (int i = 0; i < n + n; i++) {
+                char c = ss.charAt(i);
+                if ((c == '0') != (i % 2 == 0)) cnt++;
+                if (i >= n) {
+                    int j = i - n;
+                    char cj = ss.charAt(j);
+                    if ((cj == '0') != (j % 2 == 0)) cnt--;
+                    res = Math.min(res, cnt);
                 }
-                res = Math.min(res, cnt);
+            }
+
+            // starts with '1'
+            cnt = 0;
+            for (int i = 0; i < n + n; i++) {
+                char c = ss.charAt(i);
+                if ((c == '0') == (i % 2 == 0)) cnt++;
+                if (i >= n) {
+                    int j = i - n;
+                    char cj = ss.charAt(j);
+                    if ((cj == '0') == (j % 2 == 0)) cnt--;
+                    res = Math.min(res, cnt);
+                }
             }
             return res;
         }

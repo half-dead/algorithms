@@ -16,34 +16,66 @@ public class Puzzle1157 {
         System.out.println(mc.query(3, 12, 6));
     }
 
+    // binary search
     class MajorityChecker {
 
-        int[] nums;
-        Map<Integer, TreeSet<Integer>> ts;
+        int[] data;
+        TreeMap<Integer, Set<Integer>> tm;
+        Map<Integer, int[]> occur;
 
         public MajorityChecker(int[] arr) {
-            nums = arr;
-            ts = new HashMap<>();
+            this.data = arr;
+            occur = new HashMap<>();
+
+            Map<Integer, Integer> freq = new HashMap<>();
+            for (int x : arr) {
+                freq.put(x, freq.getOrDefault(x, 0) + 1);
+            }
+
+            tm = new TreeMap<>();
+            for (int k : freq.keySet()) {
+                int v = freq.get(k);
+
+                tm.computeIfAbsent(v, x -> new HashSet<>()).add(k);
+            }
+
+            Map<Integer, List<Integer>> temp = new HashMap<>();
             for (int i = 0; i < arr.length; i++) {
-                int num = arr[i];
-                ts.computeIfAbsent(num, x -> new TreeSet<>()).add(i);
+                int x = arr[i];
+                temp.computeIfAbsent(x, y -> new ArrayList<>()).add(i);
+            }
+
+            for (int k : temp.keySet()) {
+                List<Integer> seq = temp.get(k);
+                int[] a = new int[seq.size()];
+                for (int i = 0; i < seq.size(); i++) {
+                    a[i] = seq.get(i);
+                }
+                occur.put(k, a);
             }
         }
 
         public int query(int left, int right, int threshold) {
-            int total = right - left + 1, remain = total;
-            Set<Integer> checked = new HashSet<>();
-            for (int i = left; i <= right; i++) {
-                int num = nums[i];
-                if (!checked.add(num)) continue;
+            if (left == right) return data[left];
 
-                int cnt = ts.get(num).subSet(left, true, right, true).size();
-                if (cnt >= threshold) return num;
+            for (int repeat : tm.descendingKeySet()) {
+                if (repeat < threshold) break;
 
-                remain -= cnt;
-                if (remain < threshold) break;
+                Set<Integer> set = tm.get(repeat);
+                for (int cand : set) {
+                    int[] seq = occur.get(cand);
+                    int lo = Arrays.binarySearch(seq, left);
+                    int hi = Arrays.binarySearch(seq, right);
+
+                    if (lo < 0) lo = -lo - 1;
+                    if (hi < 0) hi = -hi - 2;
+                    if (hi - lo + 1 >= threshold) {
+                        return cand;
+                    }
+                }
             }
             return -1;
         }
     }
+
 }

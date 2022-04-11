@@ -31,7 +31,8 @@ public class Puzzle062_UniquePaths {
 
     public static void main(String[] args) {
         Solution s = new Puzzle062_UniquePaths().new Solution();
-        System.out.println(s.uniquePaths(15, 15));
+        for (int i = 1; i <= 10; i++)
+            System.out.println(s.uniquePaths(i, i));
     }
 
     // dp

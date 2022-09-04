@@ -2,70 +2,57 @@ package util;
 
 /**
  * @author half-dead
- */
-public class SegmentTree {
-    public static void main(String args[]) {
-        int[] arr = {1, 3, 5, 7, 9, 11};
-        SegmentTree tree = new SegmentTree(arr);
+ */ // SegmentTree for Range Query Sum
+// Tested by https://leetcode.com/problems/range-sum-query-mutable/
+class SegmentTree {
+    private int size;
+    private int[] nodes;
 
-        System.out.println("Sum of values in given range = " + tree.sum(1, 3));
-        tree.add(1, 7);
-        System.out.println("Updated sum of values in given range = " + tree.sum(1, 3));
+    // 0 ... n - 1
+    public SegmentTree(int[] input) {
+        this.size = input.length;
+        this.nodes = new int[this.size * 4];
+        build(0, 0, size - 1, input);
     }
 
-
-    private int[] st;
-    private int n;
-
-    public SegmentTree(int[] arr) {
-        n = arr.length;
-        int height = (int) (Math.ceil(Math.log(n) / Math.log(2)));
-        st = new int[2 * (int) Math.pow(2, height) - 1];
-        construct(arr, 0, n - 1, 0);
-    }
-
-    public int sum(int left, int right) {
-        if (left < 0 || right >= n || left > right) return -1;
-
-        return sum(0, n - 1, left, right, 0);
-    }
-
-    public void add(int index, int delta) {
-        if (index < 0 || index >= n || delta == 0) return;
-
-        add(0, n - 1, index, delta, 0);
-    }
-
-    private int construct(int[] arr, int left, int right, int index) {
-        if (left == right) return st[index] = arr[left];
-
-        int mid = getMid(left, right);
-        return st[index] = construct(arr, left, mid, index * 2 + 1) + construct(arr, mid + 1, right, index * 2 + 2);
-    }
-
-    private int sum(int start, int end, int queryLeft, int queryRight, int index) {
-        if (queryLeft <= start && queryRight >= end) return st[index];
-        if (end < queryLeft || start > queryRight) return 0;
-
-        int mid = getMid(start, end);
-        return sum(start, mid, queryLeft, queryRight, 2 * index + 1) +
-                sum(mid + 1, end, queryLeft, queryRight, 2 * index + 2);
-    }
-
-    private void add(int start, int end, int index, int delta, int segmentIndex) {
-        if (index < start || index > end) return;
-
-        st[segmentIndex] += delta;
-        if (end != start) {
-            int mid = getMid(start, end);
-            add(start, mid, index, delta, 2 * segmentIndex + 1);
-            add(mid + 1, end, index, delta, 2 * segmentIndex + 2);
+    private void build(int x, int l, int r, int[] input) {
+        if (l == r) {
+            nodes[x] = input[l]; //// TODO
+            return;
         }
+
+        int m = (l + r) >> 1;
+        build(x * 2 + 1, l, m, input);
+        build(x * 2 + 2, m + 1, r, input);
+        nodes[x] = nodes[x * 2 + 1] + nodes[x * 2 + 2]; //// TODO
     }
 
-    int getMid(int s, int e) {
-        return s + (e - s) / 2;
+    public void update(int pos, int value) {
+        update(0, 0, size - 1, pos, value);
     }
 
+    private void update(int x, int l, int r, int pos, int value) {
+        if (l == r) {
+            nodes[x] = value; //// TODO
+            return;
+        }
+        int m = (l + r) >> 1;
+        if (pos <= m) update(x * 2 + 1, l, m, pos, value);
+        else update(x * 2 + 2, m + 1, r, pos, value);
+        nodes[x] = nodes[x * 2 + 1] + nodes[x * 2 + 2]; //// TODO
+    }
+
+    public int query(int queryL, int queryR) {
+        return query(0, 0, size - 1, queryL, queryR);
+    }
+
+    private int query(int x, int l, int r, int queryL, int queryR) {
+        if (queryL <= l && r <= queryR) {
+            return nodes[x];
+        }
+        int m = (l + r) >> 1;
+        if (queryR <= m) return query(x * 2 + 1, l, m, queryL, queryR);
+        else if (m + 1 <= queryL) return query(x * 2 + 2, m + 1, r, queryL, queryR);
+        else return query(x * 2 + 1, l, m, queryL, queryR) + query(x * 2 + 2, m + 1, r, queryL, queryR); //// TODO
+    }
 }
-
